@@ -133,7 +133,6 @@ end
 local function UpdateTreeOrders()
   if NumStackedTrees() < ReorderThreshold then -- order more trees
     TreesOrdered = TreesOrdered or Object.Spawn( 'OrderTree', 0, 0 )
-    print( 'trees ordered' )
 
   elseif TreesOrdered then -- cancel exissting order
     TreesOrdered.Delete()
@@ -169,10 +168,8 @@ end
 
 -- triggered once when foreman object created
 function Create()
-  print( 'Create' )
   -- create embargo object
   Embargoes = Object.Spawn( 'ExportEmbargoes', this.Pos.x, this.Pos.y )
-  print( 'Embargoes.u = '..Embargoes.Id.u )
   -- make foreman carry the embargos
   this.Carrying.i, this.Carrying.u = Embargoes.Id.i, Embargoes.Id.u
   Embargoes.CarrierId.i, Embargoes.CarrierId.u = this.Id.i, this.Id.u
@@ -185,16 +182,11 @@ end
 
 -- triggered once when loading a save game
 function Update()
-  print( 'first update' )
-  -- if no embargo obect found, create it
-  if this.Carrying.i == -1 then return Create() end
   -- get embargo
-  this.Carrying.i, this.Carrying.u = -1, -1
   Embargoes = next( Find( 'ExportEmbargoes', 2 ) )
-  this.Carrying.i, this.Carrying.u = Embargoes.Id.i, Embargoes.Id.u
+  if not Embargoes then return Create() end
   -- tooltip
   this.Tooltip = Tooltips[ Embargoes.SubType ]
-  print('found Embargoes')
   -- use recurring update from now on
   _G.Update = _G.RecurringUpdate
   _G.RecurringUpdate = nil
@@ -203,9 +195,7 @@ end
 -- recurring update
 function RecurringUpdate()
   if Now() > Ready then
-
-    print( 'recurring update' )
-
+    
     this.Tooltip = Tooltips[ Embargoes.SubType ]
 
     CacheStacks()
