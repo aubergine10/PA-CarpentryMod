@@ -1,8 +1,8 @@
 
 function Create()
-	_G.Update = nil
+  _G.Update = nil
 end
 
 function Update()
-	this.Delete()
+  this.Delete()
 end
