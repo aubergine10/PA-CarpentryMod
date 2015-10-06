@@ -1,0 +1,176 @@
+############### Log2 ############
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Log2  
+    Container            WorkshopSaw  
+    Distribution         NonCompeting  
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Log2  
+    Container            WoodSaw  
+    Distribution         NonCompeting  
+    MaxSlotId            0
+    Room                 WoodWorkshop   
+END
+
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Log2  
+    Container            Table  
+    Room                 Workshop  
+    Distribution         OutOfStock  
+    MaxSlotId            3  
+    Condition            NotLoaded 
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Log2  
+    Container            Table  
+    Room                 WoodWorkshop  
+    Distribution         OutOfStock  
+    MaxSlotId            3  
+    Condition            NotLoaded 
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Wood  
+    Container            Table  
+    Room                 WoodWorkshop  
+    Distribution         OutOfStock  
+    MaxSlotId            3  
+    Condition            NotLoaded 
+END
+
+
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Wood2  
+    Container            CarpenterTable  
+    Distribution         NonCompeting  
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Wood2 
+    Container            CarpenterTable  
+    Distribution         OutOfStock  
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Wood2 
+    Container            Table  
+    Room                 Workshop  
+    Distribution         NonCompeting  
+    MaxSlotId            3  
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Wood2  
+    Room                 Workshop  
+    Distribution         NonCompeting  
+    Condition            NotLoaded  
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Wood2 
+    Container            Table  
+    Room                 WoodWorkshop  
+    Distribution         NonCompeting  
+    MaxSlotId            3  
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Wood2  
+    Room                 WoodWorkshop  
+    Distribution         NonCompeting  
+    Condition            NotLoaded  
+END
+
+
+###### Log ########
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Log  
+    Container            Table  
+    Room                 WoodWorkshop  
+    Distribution         OutOfStock  
+    MaxSlotId            3  
+    Condition            NotLoaded 
+END
+
+BEGIN ProductionRule       
+    Rule                 Storage
+    Material             Log  
+    Container            WoodSaw  
+    Room                 WoodWorkshop  
+    Distribution         OutOfStock  
+    MaxSlotId			       0
+END
+
+
+
+
+
+#### Processors ################
+BEGIN Processor
+    Processor            WorkshopSaw
+    Input                Log2
+    InputCount           1
+    Output               Wood2
+    OutputCount          4
+    OperatingTime        45.0
+    Worker              Prisoner
+    Qualification       WorkshopInduction
+END
+
+
+
+ BEGIN Processor
+       Processor           WoodSaw
+       Input               Log2
+       InputCount          1
+       Output              Wood2
+       OutputCount         4
+       Object              WoodSaw
+       OperatingTime       45.0
+       Properties          ShowDuringOperation
+       Worker              Prisoner
+       Qualification       WorkshopInduction
+   END
+
+
+
+ BEGIN Processor
+       Processor           WoodSaw
+       Input               Log
+       InputCount          1
+       Output              Wood
+       OutputCount         4
+       OperatingTime       45.0
+       Properties          ShowDuringOperation
+       Object              WoodSaw
+       Worker              Prisoner
+       Qualification       WorkshopInduction
+   END
+   
+   
+   
+ BEGIN Processor
+    Processor            CarpenterTable
+    Input                Wood2
+    InputCount           5
+    Output               SuperiorBed
+    OperatingTime        60.0
+    Properties           ShowDuringOperation
+END
+

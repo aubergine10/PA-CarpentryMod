@@ -1,0 +1,248 @@
+
+#######################################################
+############### edited vanilla objects ################
+#######################################################
+
+
+BEGIN Object
+    Name                Log
+    MaxStackSize        3
+    RenderDepth         1
+    Price               -100
+    Sprite              RawWood
+    StackSprite         StackLogs
+    Properties          Material
+    Properties          Sellable
+    Properties          Scripted    
+END
+
+BEGIN Object
+    Name                Wood
+    MaxStackSize        20
+    RenderDepth         1
+    Price               -100
+    Sprite              Wood
+    StackSprite         StackWood
+    Properties          Material
+    Properties          Sellable
+    Properties          Scripted    
+END 
+
+BEGIN Object     
+    Name                 Foreman  
+    Price                -1000  
+    NumSlots             1
+    RenderDepth          2  
+    Toughness            5
+    ViewRange            3
+    BlockedBy            Wall  
+    BlockedBy            StaticObject  
+    BlockedBy            UtilityStation  
+    Research             Maintainance
+    Sprite               Foreman  
+    Properties           Entity
+    Properties           Administrator   
+    Properties           Staff 
+    Equipment            Clipboard
+    Properties           Scripted
+END
+
+BEGIN Object
+    Name                 WorkshopSaw
+    Price                -1500
+    ConstructionTime     20
+    MoveSpeedFactor      0.500000  
+    Toughness            15.0000
+    Width                3
+    NumSlots             3  
+    Sprite               WorkshopSaw
+    SpriteScale          1.1
+    ToolbarSprite        WorkshopSawToolbar
+    Properties           StaticObject
+    Properties           Electrical
+    Properties           RoomSpecific
+    Properties           Processor
+    MadeOf               Composite
+    Group                StaticObject
+    BlockedBy            Wall
+    BlockedBy            StaticObject  
+    BlockedBy            UtilityStation  
+    Research             PrisonLabour
+    BEGIN Workers
+        Worker           Guard
+    END
+END
+
+#######################################################
+#################### new objects ######################
+#######################################################
+
+######## logs/wood ####################################
+
+BEGIN Object
+    Name                Log2
+    MaxStackSize        3
+    RenderDepth         1
+    Sprite              RawWood
+    StackSprite         StackLogs
+    Properties          Material
+END
+
+BEGIN Object
+    Name                Wood2
+    MaxStackSize        20
+    RenderDepth         1
+    Price               -100
+    Sprite              Wood
+    StackSprite         StackWood
+    Properties          Material
+END 
+    
+BEGIN Object
+    Name                ExportEmbargoes
+    RenderDepth         1
+    MadeOf              Composite
+    Toughness           50000.000
+    Width               1
+    Height              1
+    BEGIN Sprite
+        x               0
+        y               0
+        w               2
+        h               2
+        RotateType      4
+    END
+    BEGIN Sprite
+        x               2
+        y               0
+        w               2
+        h               2
+        RotateType      4
+    END
+    BEGIN Sprite
+        x               4
+        y               0
+        w               2
+        h               2
+        RotateType      4
+    END
+    BEGIN Sprite
+        x               6
+        y               0
+        w               2
+        h               2
+        RotateType      4
+    END
+END
+
+BEGIN Object     
+    Name                 ToggleLogEmbargo
+    Toughness            20.0000 
+    Price                1 
+    RenderDepth          2  
+    ToolbarSprite        StackLogs
+    Properties           Entity
+    Properties           DoesNotTire
+    Properties           Scripted
+    Properties           SlowDelivery
+END
+
+BEGIN Object     
+    Name                 ToggleWoodEmbargo
+    Toughness            20.0000 
+    Price                1 
+    RenderDepth          2  
+    ToolbarSprite        StackWood
+    Properties           Entity
+    Properties           DoesNotTire
+    Properties           Scripted
+    Properties           SlowDelivery
+END
+
+################# Tree ###############
+
+BEGIN Object     
+    Name                OrderTree
+    AutoOrder           Tree
+    AutoOrderQuantity   20
+    Width               1
+    Height              1
+    Properties          Scripted
+    BEGIN Sprite
+        x               6
+        y               2
+        w               2
+        h               2
+        RotateType      4
+    END
+    MadeOf               Wood
+    Properties           StaticObject
+END
+
+BEGIN Object     
+    Name                 Tree  
+    Width                3
+    Height               3  
+    ConstructionTime     30.00000  
+    Toughness            10.0000  
+    RenderDepth          2
+    Price                -100
+    Group                StaticObject  
+    BlockedBy            Wall  
+    BlockedBy            StaticObject  
+    BlockedBy            UtilityStation  
+    Sprite               TreeInPot
+    StackSprite          StackTrees
+    SpriteScale          0.5
+    ToolbarSprite        Tree
+    MadeOf               Wood
+    MaxStackSize         5  
+    Research             GroundsKeeping
+    Properties           StaticObject
+    Properties           SlowDelivery
+END
+ 
+################# Carpentry ###############
+
+BEGIN Object 
+    Name                 WoodSaw
+    Width                3
+    Height               1
+    ConstructionTime     15.00000  
+    MoveSpeedFactor      0.250000  
+    Toughness            25.0000  
+    Price                -1650  
+    NumSlots             3
+    Group                StaticObject  
+    BlockedBy            Wall    
+    BlockedBy            StaticObject   
+    BlockedBy            UtilityStation  
+    MadeOf               SolidMetal
+    Properties           StaticObject
+    Properties           Processor
+    Properties           RoomSpecific
+    Workgroup            Workshop
+    BEGIN ToolbarSprite  x 2  y 2  w 3  h 3   RotateType 4  END
+    BEGIN Sprite         x 0  y 2  w 6  h 3   RotateType 4
+        BEGIN Marker         x 1       y 1       orientation.x 0  orientation.y 0   Index 0   END
+        BEGIN Marker         x 2.96875 y 1.4375  orientation.x 0  orientation.y -1  Index 1   END
+        BEGIN Marker         x 5       y 1       orientation.x 0  orientation.y 0   Index 2   END
+    END
+    Worker               Prisoner
+END
+
+BEGIN Room       
+    Name                 WoodWorkshop 
+    Research             PrisonLabour 
+    Properties           PrisonersCanWork    
+    Qualification        WorkshopInduction
+    BEGIN Requirement Type MinimumSize  x 5  y 5  END
+    BEGIN Requirement Type Object   Id Table END
+    BEGIN Requirement Type Object   Id CarpenterTable  END
+    BEGIN Requirement Type Object   Id WoodSaw         END
+    BEGIN Contraband    Id      Saw             END
+    BEGIN Contraband    Id      Screwdriver     END
+    BEGIN Contraband    Id      Hammer          END
+    BEGIN Contraband    Id      Drill           END
+    BEGIN Contraband    Id      WoodenPickAxe   END
+END

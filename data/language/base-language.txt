@@ -1,0 +1,26 @@
+
+
+buildtoolbar_popup_staff_togglelogembargo 		 Toggle log export embargo
+buildtoolbar_popup_staff_togglewoodembargo 		 Toggle wood export embargo
+buildtoolbar_popup_obj_logsaw                  A less costly saw for cutting wood.\n\nCan only be used in a Carpentry workshop.
+buildtoolbar_popup_room_woodworkshop           Similar to the normal workshop but dedicated to woodwork.\n\nPlace embargos on logs and wood exports to maximise profits!
+
+object_exportembargoes							 Export Embargoes
+tooltip_embargo_none								 No export embargoes (can sell logs & wood)
+tooltip_embargo_logs								 Logs export embargoed (can only sell wood)
+tooltip_embargo_wood								 Wood export embargoed (can only sell logs)
+tooltip_embargo_both								 Logs & Wood export embargoed
+
+object_log2                          Log (Embargoed)
+object_togglelogembargo              Toggle Log Embargo
+object_logenabled                    Sell Log
+
+object_wood2                         Wood (Embargoed)
+object_togglewoodembargo             Toggle Wood Embargo
+object_woodenabled                   Sell Wood
+
+object_ordertree                     Trees Ordered...
+
+object_woodsaw                       Carpentry Saw
+room_woodworkshop                    Carpentry
+

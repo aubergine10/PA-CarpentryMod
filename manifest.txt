@@ -1,0 +1,10 @@
+
+Name                 "Carpentry Mod v2.0"  
+Description          "Based on Trixi's 'Improved Workshop Mod'\n\nExport Embargoes: Toggle export sales of logs and wood\n\nCarpentry Room: Dedicated room for woodwork (no metalwork)\n\nTrees are now ordered in stacks - no more single tree deliveries!"
+IsTranslation        false  
+Version              2.000000  
+Date                 06/10/2015  
+FileID                
+UpdateTime            
+SteamAuthor           
+Author               Trixi  
