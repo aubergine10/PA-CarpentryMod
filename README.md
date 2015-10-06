@@ -2,13 +2,13 @@
 
 Features:
 
-* New "Carpentry" room that's dedicated to woodwork
-* New "Carpentry Saw" - cheaper than workshop saw
-* Ability to impose an embargoes on log and/or wood exports
+* Adds *"Carpentry" room* that's dedicated to woodwork
+* Adds *"Carpentry Saw"* - cheaper than workshop saw but only cuts wood
+* Ability to *impose an embargoes* on log and/or wood exports
  * The buttons to toggle embargoes can be found on Staff menu
  * Embargoed resources = more carpentry work = more profits
  * Foreman 'holds' the embargo details, see his tooltip for details
-* Trees are ordered in stacks - no more single-tree deliveries!
+* *Trees are ordered in stacks* - no more single-tree deliveries!
 
 ## Credits
 
