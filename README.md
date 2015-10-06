@@ -17,7 +17,6 @@ This mod is a fork of Trixi's ["Improved Workshop" mod](http://steamcommunity.co
 This mod has following major changes from the original:
 
 * Rebranded as Carpentry Mod
- * NOT compatible with original mod :(
 * Extensively optimised scripts
 * Foreman script now does most of the processing
 * Several scripts no longer required and removed:
