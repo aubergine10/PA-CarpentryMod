@@ -6,22 +6,19 @@ local print = Game.DebugOut
 
 -- despam Update
 local Now   = Game.Time
-local Delay = 2
+local Delay = 4 -- game seconds = prison minutes
 local Ready = Now() + Delay
 
 -- finding objects
 local Find  = this.GetNearbyObjects
 local OnMap = 9001
 
--- stack cache (refreshed each despammed update)
-local StackCache
+-- remember if we've already converted to exportable logs/wood
+local AlreadyExporting = {}
 
 -- tree orders
 local TreesOrdered = false
 local ReorderThreshold = 10
-
--- remember if we've already converted to exportable logs/wood
-local AlreadyExporting = {}
 
 -- current embargo defined by Embargoes.SubType:
   -- 0 = none
@@ -32,7 +29,7 @@ local Embargoes
 
 -- lookup tables to work out if objType is sellable
 local CanSell = {}
-CanSell.Log  = { [ 0 ] = true, [ 2 ] = true }
+CanSell.Logs = { [ 0 ] = true, [ 2 ] = true }
 CanSell.Wood = { [ 0 ] = true, [ 1 ] = true }
 
 -- emabrgo tooltips
@@ -72,9 +69,9 @@ end
 -- cache numbers for our obj types
 Bug9969.CacheNums = function()
   local test = Object.Spawn( 'Stack', 0, 0 )
-  Bug9969['Log']   = Bug9969.GetNumFor( test, 'Log'  , 45  )
-  Bug9969['Log2']  = Bug9969.GetNumFor( test, 'Log2' , 176 )
-  Bug9969['Wood']  = Bug9969.GetNumFor( test, 'Wood' , 46  )
+  Bug9969['Log'  ] = Bug9969.GetNumFor( test, 'Log'  , 45  )
+  Bug9969['Log2' ] = Bug9969.GetNumFor( test, 'Log2' , 176 )
+  Bug9969['Wood' ] = Bug9969.GetNumFor( test, 'Wood' , 46  )
   Bug9969['Wood2'] = Bug9969.GetNumFor( test, 'Wood2', 177 )
   test.Delete()
 end
@@ -82,11 +79,7 @@ end
 Bug9969.CacheNums()
 
 
--- # generic functions -----------------------------------------------------
-
-local function CacheStacks()
-  StackCache = Find( 'Stack', OnMap )
-end
+-- # helper functions ------------------------------------------------------
 
 -- replace oldType objects with newType objects
 local function ConvertObjects( oldType, newType )
@@ -101,46 +94,80 @@ local function ConvertObjects( oldType, newType )
   end
 end
 
--- determine if a stack is already in/on a saw
-local InSaw do
-  local find = Object.GetNearbyObjects
-  
-  InSaw = function( stack )
-    return find( stack, 'WorkshopSaw', 2 ) or find( stack, 'WoodSaw', 2 )
-  end
+-- determine if we are processing a stack
+local Processing = Object.GetNearbyObjects
+
+local function Sawing( stack )
+    return next( Processing( stack, 'WorkshopSaw', 2 ) ) or
+           next( Processing( stack, 'WoodSaw'    , 2 ) )
 end
 
--- replace oldType stacks with newType stacks
-local function ConvertStacks( oldType, newType )
-  newType = Bug9969[ newType ] -- delete this line when bug is fixed
-  for stack in next, StackCache do
-    if stack.Contents == oldType and not InSaw(stack) then
-      stack.Contents = newType
-    end
-  end
+local function MakingBed( stack )
+    return next( Processing( stack, 'CarpenterTable', 2 ) )
 end
 
+-- convert resources based on embargoed state, and order trees if required
+local function ManageResources( currentEmbargoes )
 
--- # tree ordering ---------------------------------------------------------
+  -- work out what we need to convert from/to
 
--- note: OrderTree objects self-destruct after loading a save (OrderTree.lua)
+  local logs, otherLogs, convertLogs,
+        wood, otherWood, convertWood
 
--- count number of trees in stacks
-local function NumStackedTrees()
-  local treeCount = 0
+  if CanSell.Logs[ currentEmbargoes ] then
+    logs, otherLogs = 'Log2', 'Log'
+    convertLogs = not AlreadyExporting.Logs -- new logs default to exportable
+    AlreadyExporting.Logs = true
+  else
+    logs, otherLogs = 'Log', 'Log2'
+    convertLogs = true
+    AlreadyExporting.Logs = false
+  end
 
-  for stack in next, StackCache do
-    if stack.Contents == 'Tree' then
+  if CanSell.Wood[ currentEmbargoes ] then
+    logs, otherWood = 'Wood2', 'Wood'
+    convertLogs = not AlreadyExporting.Wood -- new wood default to exportable
+    AlreadyExporting.Wood = true
+  else
+    logs, otherWood = 'Wood', 'Wood2'
+    convertLogs = true
+    AlreadyExporting.Wood = false
+  end
+
+  -- objects
+
+  if convertLogs then ConvertObjects( logs, otherLogs ) end
+  if convertWood then ConvertObjects( wood, otherWood ) end
+
+  -- stacks
+
+  local stacks = Find( 'Stack', OnMap )
+  local treeCount, contents = 0
+
+  for stack in next, stacks do
+
+    contents = stack.Contents
+
+    if contents == 'Tree' then
       treeCount = treeCount + stack.Quantity
+
+    else if contents == logs then
+      if not Sawing( stack ) then
+        stack.Contents = Bug9969[ otherLogs ]
+      end
+
+    else if contents == wood then
+      if not MakingBed( stack ) then
+        stack.Contents = Bug9969[ otherWood ]
+      end
+
     end
+
   end
 
-  return treeCount
-end
+  -- trees
 
--- order more trees if necesary, otherwise cancel outstanding orders
-local function UpdateTreeOrders()
-  if NumStackedTrees() < ReorderThreshold then -- order more trees
+  if treeCount < ReorderThreshold then -- order more trees
     TreesOrdered = TreesOrdered or Object.Spawn( 'OrderTree', 0, 0 )
 
   elseif TreesOrdered then -- cancel exissting order
@@ -148,28 +175,12 @@ local function UpdateTreeOrders()
     TreesOrdered = false
 
   end
+
 end
 
-
--- # log/wood sales --------------------------------------------------------
-
-local function UpdateExports( sellableType, embargoedType )
-  local oldType, newType
-
-  if CanSell[ sellableType ][ Embargoes.SubType ] then
-    if AlreadyExporting[ sellableType ] then -- no action required
-      return
-    else -- lift embargo
-      oldType, newType = embargoedType, sellableType
-      AlreadyExporting[ sellableType ] = true
-    end
-  else -- impose embargo
-    oldType, newType = sellableType, embargoedType
-    AlreadyExporting[ sellableType ] = false
-  end
-
-  ConvertObjects( oldType, newType )
-  ConvertStacks(  oldType, newType )
+-- set .i and .u
+local function SetId( target, source )
+  target.i, target.u = source.i, source.u
 end
 
 
@@ -177,11 +188,15 @@ end
 
 -- triggered once when foreman object created
 function Create()
-  -- create embargo object
-  Embargoes = Object.Spawn( 'ExportEmbargoes', this.Pos.x, this.Pos.y )
-  -- make foreman carry the embargos
-  this.Carrying.i, this.Carrying.u = Embargoes.Id.i, Embargoes.Id.u
-  Embargoes.CarrierId.i, Embargoes.CarrierId.u = this.Id.i, this.Id.u
+  -- if triggered by Update() we might alrady have embargoes
+  Embargoes = next( Find( 'ExportEmbargoes', 2 ) )
+  -- create if not found
+  if not Embargoes then
+    Embargoes = Object.Spawn( 'ExportEmbargoes', this.Pos.x, this.Pos.y )
+    -- make foreman carry the embargos
+    SetId( this.Carrying,  Embargoes.Id )
+    SetId( Embargoes.CarrierId, this.Id )
+  end
   -- tooltip
   this.Tooltip = Tooltips[ Embargoes.SubType ]
   -- use recurring update from now on
@@ -191,28 +206,18 @@ end
 
 -- triggered once when loading a save game
 function Update()
-  -- get embargo
-  Embargoes = next( Find( 'ExportEmbargoes', 2 ) )
-  if not Embargoes then return Create() end
-  -- tooltip
-  this.Tooltip = Tooltips[ Embargoes.SubType ]
-  -- use recurring update from now on
-  _G.Update = _G.RecurringUpdate
-  _G.RecurringUpdate = nil
+  Create() -- reinitialise script
 end
 
 -- recurring update
 function RecurringUpdate()
   if Now() > Ready then
-    
-    this.Tooltip = Tooltips[ Embargoes.SubType ]
 
-    CacheStacks()
+    local currentEmbargoes = Embargoes.SubType
 
-    UpdateTreeOrders()
+    this.Tooltip = Tooltips[ currentEmbargoes ]
 
-    UpdateExports( 'Log' , 'Log2'  )
-    UpdateExports( 'Wood', 'Wood2' )
+    ManageResources( currentEmbargoes )
 
     Ready = Now() + Delay
   end
