@@ -10,6 +10,8 @@ Features:
  * Foreman 'holds' the embargo details, see his tooltip for details
 * **Trees auto-ordered in stacks** - no more single-tree deliveries!
 
+![Image](thumbnail.png)
+
 ## Credits
 
 This mod is a fork of Trixi's ["Improved Workshop" mod](http://steamcommunity.com/sharedfiles/filedetails/?id=514236957). Trixi did all the hard work developing the features, sprites, etc., so all credit to him! All I did was refactor the mod.
