@@ -101,11 +101,20 @@ local function ConvertObjects( oldType, newType )
   end
 end
 
+-- determine if a stack is already in/on a saw
+local InSaw do
+  local find = Object.GetNearbyObjects
+  
+  InSaw = function( stack )
+    return find( stack, 'WorkshopSaw', 2 ) or find( stack, 'WoodSaw', 2 )
+  end
+end
+
 -- replace oldType stacks with newType stacks
 local function ConvertStacks( oldType, newType )
   newType = Bug9969[ newType ] -- delete this line when bug is fixed
   for stack in next, StackCache do
-    if stack.Contents == oldType then
+    if stack.Contents == oldType and not InSaw(stack) then
       stack.Contents = newType
     end
   end
